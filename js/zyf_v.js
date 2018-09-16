@@ -4,6 +4,7 @@
         this.elements = new Map();
         this.add = function(rule){
             this.rules.push(rule);
+
         };
         this.serialize_format = function(){
             var ls = this.elements.list();
