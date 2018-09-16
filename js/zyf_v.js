@@ -4,7 +4,6 @@
         this.elements = new Map();
         this.add = function(rule){
             this.rules.push(rule);
-            this.init_rule();
         };
         this.serialize_format = function(){
             var ls = this.elements.list();
@@ -63,11 +62,8 @@
                 var rule = this.rules[i];
                 var element = this.elements.get(rule.one);
                 var other_e = this.elements.get(rule.another);
-                other_e.resetRules({"key":rule.one});
+                other_e.resetRules();
                 var val = element.value();
-                if(val==""||val==null){
-                    other_e.replaceRules(new s_rule(rule.one,"","l"))
-                }
                 var vs = val.split(",");
                 for(var j=0;j<rule.data.length;j++){
                     var effect = false;
@@ -84,22 +80,41 @@
                         if (rule.data[j][2]=="avoid"){
                             if (element.z_type == "single"){
                                 if(rule.data[j].length==4){
-                                    other_e.replaceRules(new s_rule(rule.one,rule.data[j][1],rule.data[j][3]));
+                                    other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
                                 }else
-                                    other_e.replaceRules(new s_rule(rule.one,rule.data[j][1]));
+                                    other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                             } else if (element.z_type=="multi") {
                                 if(rule.data[j].length==4) {
-                                    other_e.updateRules(new s_rule(rule.one,rule.data[j][1],rule.data[j][4]));
+                                    other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
                                 }else
-                                    other_e.updateRules(new s_rule(rule.one,rule.data[j][1]));
+                                    other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                             }
+                        }else if (rule.data[j][2]=="if"){
+                            var _vs = element.value().split(",");
+                            var _rs = rule.data[j][1].split(",");
+                            var _c = true;
+                            for (var _j=0;_j<_rs.length;_j++){
+                                var _b = false;
+                                for (var _i=0;_i<_vs.length;_i++){
+                                    if(_rs[_j]==_vs[_i]){
+                                        _b = true;
+                                    }
+                                }
+                                if(!_b){
+                                    _c = false;
+                                    break;
+                                }
+                            }
+                            if(_c){
+                                rule.func(rule.one+"_"+rule.another);
+                            }
+
                         }  else {
                             if(rule.data[j].length==4) {
-                                other_e.replaceRules(new s_rule(rule.one,rule.data[j][2],rule.data[j][4]));
+                                other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
                             }else{
-                                other_e.replaceRules(new s_rule(rule.one,rule.data[j][2]));
+                                other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                             }
-                            break;
                         }
                     }
                 }
@@ -114,11 +129,8 @@
                 var other_e = this.elements.get(rule.another);
                 if(rule.z_event == "click"){
                     element.instance().click(function () {
-                        other_e.resetRules({"key":rule.one});
+                        other_e.resetRules();
                         var val = element.value();
-                        if(val==""||val==null){
-                            other_e.replaceRules(new s_rule(rule.one,"","l"))
-                        }
                         var vs = val.split(",");
                         for(var j=0;j<rule.data.length;j++){
                             var effect = false;
@@ -135,22 +147,41 @@
                                 if (rule.data[j][2]=="avoid"){
                                     if (element.z_type == "single"){
                                         if(rule.data[j].length==4){
-                                            other_e.replaceRules(new s_rule(rule.one,rule.data[j][1],rule.data[j][3]));
+                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
                                         }else
-                                            other_e.replaceRules(new s_rule(rule.one,rule.data[j][1]));
+                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                                     } else if (element.z_type=="multi") {
                                         if(rule.data[j].length==4) {
-                                            other_e.updateRules(new s_rule(rule.one,rule.data[j][1],rule.data[j][4]));
+                                            other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
                                         }else
-                                            other_e.updateRules(new s_rule(rule.one,rule.data[j][1]));
+                                            other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                                     }
-                                }  else{
+                                }else if (rule.data[j][2]=="if"){
+                                    var _vs = element.value().split(",");
+                                    var _rs = rule.data[j][1].split(",");
+                                    var _c = true;
+                                    for (var _j=0;_j<_rs.length;_j++){
+                                        var _b = false;
+                                        for (var _i=0;_i<_vs.length;_i++){
+                                            if(_rs[_j]==_vs[_i]){
+                                                _b = true;
+                                            }
+                                        }
+                                        if(!_b){
+                                            _c = false;
+                                            break;
+                                        }
+                                    }
+                                    if(_c){
+                                        rule.func(rule.one+"_"+rule.another);
+                                    }
+
+                                }  else {
                                     if(rule.data[j].length==4) {
-                                        other_e.replaceRules(new s_rule(rule.one,rule.data[j][2],rule.data[j][4]));
+                                        other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
                                     }else{
-                                        other_e.replaceRules(new s_rule(rule.one,rule.data[j][2]));
+                                        other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                                     }
-                                    break;
                                 }
                             } 
                         }
@@ -158,11 +189,8 @@
                     });
                 }else if(rule.z_event == "change"){
                     element.instance().change(function () {
-                        other_e.resetRules({"key":rule.one});
+                        other_e.resetRules();
                         var val = element.value();
-                        if(val==""||val==null){
-                            other_e.replaceRules(new s_rule(rule.one,"","l"))
-                        }
                         var vs = val.split(",");
                         for(var j=0;j<rule.data.length;j++){
                             var effect = false;
@@ -179,22 +207,41 @@
                                 if (rule.data[j][2]=="avoid"){
                                     if (element.z_type == "single"){
                                         if(rule.data[j].length==4){
-                                            other_e.replaceRules(new s_rule(rule.one,rule.data[j][1],rule.data[j][3]));
+                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
                                         }else
-                                            other_e.replaceRules(new s_rule(rule.one,rule.data[j][1]));
+                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                                     } else if (element.z_type=="multi") {
                                         if(rule.data[j].length==4) {
-                                            other_e.updateRules(new s_rule(rule.one,rule.data[j][1],rule.data[j][4]));
+                                            other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
                                         }else
-                                            other_e.updateRules(new s_rule(rule.one,rule.data[j][1]));
+                                            other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                                     }
-                                }  else {
+                                }else if (rule.data[j][2]=="if"){
+                                    var _vs = element.value().split(",");
+                                    var _rs = rule.data[j][1].split(",");
+                                    var _c = true;
+                                    for (var _j=0;_j<_rs.length;_j++){
+                                        var _b = false;
+                                        for (var _i=0;_i<_vs.length;_i++){
+                                            if(_rs[_j]==_vs[_i]){
+                                                _b = true;
+                                            }
+                                        }
+                                        if(!_b){
+                                            _c = false;
+                                            break;
+                                        }
+                                    }
+                                    if(_c){
+                                        rule.func(rule.one+"_"+rule.another);
+                                    }
+
+                                }else {
                                     if(rule.data[j].length==4) {
-                                        other_e.replaceRules(new s_rule(rule.one,rule.data[j][2],rule.data[j][4]));
+                                        other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
                                     }else{
-                                        other_e.replaceRules(new s_rule(rule.one,rule.data[j][2]));
+                                        other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                                     }
-                                    break;
                                 }
                             }
                         }
@@ -230,7 +277,7 @@
             return ins;
         };
 
-        this.fill = function (str) {
+        this.fill = function (str,boo) {
             if(this.tagName=="INPUT"){
                 if(this.z_type=="nothing"){
                     this.instance().val(str);
@@ -238,6 +285,9 @@
                     for(var i=0;i<this.elements.length;i++){
                         if(this.elements[i].value==str){
                             this.elements[i].checked = true;
+                            if(boo){
+                                this.elements[i].disabled = true;
+                            }
                             break;
                         }
                     }
@@ -247,6 +297,9 @@
                         for(var j=0;j<ss.length;j++){
                             if(ss[j]==this.elements[i].value){
                                 this.elements[i].checked = true;
+                                if(boo){
+                                    this.elements[i].disabled = true;
+                                }
                                 continue;
                             }
                         }
@@ -256,6 +309,9 @@
                 for(var i=0;i<this.elements.length;i++){
                     if(this.elements[i].value==str){
                         this.elements[i].selected = true;
+                        if(boo){
+                            this.elements[i].disabled = true;
+                        }
                         break;
                     }
                 }
@@ -317,10 +373,14 @@
             }
 
             for(var x=0;x<l_rules.length;x++){
-                if(l_rules[x].value=="show"){
+                if(l_rules[x].ctrl=="show"){
                     this.show();
-                }else if(l_rules.value=="hide"){
+                }else if(l_rules[x].ctrl=="hide"){
                     this.hide();
+                }else if(l_rules[x].ctrl=="onlycheck"){
+                    this.fill(l_rules[x].value);
+                }else if(l_rules[x].ctrl=="checked"){
+                    this.fill(l_rules[x].value,true);
                 }else{
                     var rs = l_rules[x].value.split(",");
                     for(var y=0;y<rs.length;y++){
@@ -337,10 +397,14 @@
                 }
             }
             for(var x=0;x<m_rules.length;x++){
-                if(m_rules[x].value=="show"){
+                if(m_rules[x].ctrl=="show"){
                     this.show();
-                }else if(m_rules[x].value=="hide"){
+                }else if(m_rules[x].ctrl=="hide"){
                     this.hide();
+                }else if(m_rules[x].ctrl=="onlycheck"){
+                    this.fill(m_rules[x].value);
+                }else if(m_rules[x].ctrl=="checked"){
+                    this.fill(m_rules[x].value,true);
                 }else{
                     var rs = m_rules[x].value.split(",");
                     for(var y=0;y<rs.length;y++){
@@ -357,10 +421,14 @@
                 }
             }
             for(var x=0;x<h_rules.length;x++){
-                if(h_rules[x].value=="show"){
+                if(h_rules[x].ctrl=="show"){
                     this.show();
-                }else if(h_rules[x].value=="hide"){
+                }else if(h_rules[x].ctrl=="hide"){
                     this.hide();
+                }else if(h_rules[x].ctrl=="onlycheck"){
+                    this.fill(h_rules[x].value);
+                }else if(h_rules[x].ctrl=="checked"){
+                    this.fill(h_rules[x].value,true);
                 }else{
                     var rs = h_rules[x].value.split(",");
                     for(var y=0;y<rs.length;y++){
@@ -381,7 +449,7 @@
         this.updateRules = function(rule){
             if(this.rules.length==0){
                 this.rules[0] = rule;
-                this.initRules();
+                //this.initRules();
                 return;
             }
             for(var i=0;i<this.rules.length;i++){
@@ -400,7 +468,6 @@
         this.replaceRules = function(rule){
             if(this.rules.length==0){
                 this.rules[0] = rule;
-                this.initRules();
                 return;
             }
             for(var i=0;i<this.rules.length;i++){
@@ -416,13 +483,8 @@
             }
             //this.initRules();
         };
-        this.resetRules = function(rule){
-            for(var i=0;i<this.rules.length;i++){
-                if(this.rules[i].key == rule.key){
-                    this.rules[i].value = "";
-                    break;
-                }
-            }
+        this.resetRules = function(){
+            this.rules.splice(0,this.rules.length);
 
         };
         this.value = function(){
@@ -534,11 +596,11 @@
         return new zyf_v();
     }
 
-    function s_rule(key, value, level){
+    function s_rule(key, value, ctrl, level){
         if(!level){
             level = "m";
         }
-        return {"key":key,"value":value,"level":level};
+        return {"key":key,"value":value,"level":level,"ctrl":ctrl};
     }
 
     window._$z = _$z;
