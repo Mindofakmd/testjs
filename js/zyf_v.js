@@ -2,25 +2,72 @@
     function zyf_v() {
         this.rules = new Array();
         this.elements = new Map();
+        this.s_obj = new Map();
+        this.orders = new Array();
+        this.add_order = function(order){
+            this.orders.push(order);
+        };
+        this.check_order = function(func){
+            var msg = "";
+            for(var z=0;z<this.orders.length;z++){
+                var order = this.orders[z];
+                var os = order.split("|");
+                if(os.length>1){
+
+                }else{
+                    var o = order.split(" ");
+                    if(o.length==2){
+                        var el = this.elements.get(o[0]);
+                        if(o[1]=="required"){
+                            if(el.value()==""||el.value()==null){
+                                if(msg==""){
+                                    msg += z;
+                                }else{
+                                    msg += "," + z;
+                                }
+                            }
+                        }
+                    }else if(o.length==4){
+                        //"a !null b required"
+                        e1 = this.elements.get(o[0]);
+                        e2 = this.elements.get(o[2]);
+                        if(o[1]=="null"){
+                            if(e1.value()==""||e1.value()==null){
+                                if(o[3]=="required"){
+                                    if(e2.value()==""||e2.value()==null){
+                                        if(msg==""){
+                                            msg += z;
+                                        }else{
+                                            msg += "," + z;
+                                        }
+                                    }
+                                }
+                            }
+                        }else if(o[1]=="!null"){
+                            if(e1.value()!=""||e1.value()!=null){
+                                if(o[3]=="required"){
+                                    if(e2.value()==""||e2.value()==null){
+                                        if(msg==""){
+                                            msg += z;
+                                        }else{
+                                            msg += "," + z;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            func(msg);
+        };
         this.add = function(rule){
             this.rules.push(rule);
 
         };
         this.serialize_format = function(){
-            var ls = this.elements.list();
-            var s_obj = new Map();
-            for(var i=0;i<ls.length;i++){
-                var z_model = ls[i].value.z_model;
-                var arr = s_obj.get(z_model);
-                if(arr){
-                    arr.push(ls[i].value);
-                }else{
-                    var newarr = [ls[i].value];
-                    s_obj.put(z_model,newarr);
-                }
-            }
             var ser = "{";
-            var ll = s_obj.list();
+            var ll = this.s_obj.list();
             for(var i=0;i<ll.length;i++){
                 var sv = ll[i].value;
                 var s_s = "{";
@@ -56,6 +103,20 @@
             for(x in data){
                 var el = this.elements.get(x);
                 el.fill(data[x]);
+            }
+        };
+        this.deserialize_format = function (data) {
+            for(var x in data){
+                var es = this.s_obj.get(x);
+                var ds = data[x];
+                for(var r=0;r<es.length;r++){
+                    for(var o in ds){
+                        if(es[r].name == o){
+                            es[r].fill(ds[o]);
+                            break;
+                        }
+                    }
+                }
             }
         };
         this.loadRules = function () {
@@ -122,12 +183,19 @@
                 other_e.initRules();
 
             }
-        }
+        };
         this.init_rule = function () {
             for(var i=0;i<this.rules.length;i++){
                 var rule = this.rules[i];
-                var element = this.elements.get(rule.one);
                 var other_e = this.elements.get(rule.another);
+                if(rule.basic){
+                    if(rule.one()){
+                        other_e.updateRules(new s_rule("basic"+i,rule.data[0][1],rule.data[0][2]),"h");
+                        other_e.initRules();
+                    }
+                    continue;
+                }
+                var element = this.elements.get(rule.one);
                 if(rule.z_event == "click"){
                     element.instance().click(function () {
                         other_e.resetRules();
@@ -255,11 +323,20 @@
         this.init = function(){
             var $all =  $('input,select,textarea');
             var es = this.elements;
+            var so = this.s_obj;
             $all.each(function(){
                 var el = new element();
                 el.init(this);
-                if(el.name!=""&&el.name!=null)
+                if(el.name!=""&&el.name!=null){
                     es.put(el.name,el);
+                    var z_model = el.z_model;
+                    var arr = so.get(z_model);
+                    if(arr){
+                        arr.push(el);
+                    }else{
+                        so.put(z_model,[el]);
+                    }
+                }
             });
         }
     }

@@ -25,6 +25,27 @@ $1 = $(function () {
         data: [["1", "1", "if"]]
     }));
 
+    zyf_v.add(new r({
+        basic: true,
+        one: f,
+        another: "b",
+        func: callback,
+        data: [["", "1,2", "avoid"]]
+    }));
+
+    zyf_v.add_order("a !null b required");
+    zyf_v.add_order("c required");
+
+    //zyf_v.check_order(f_z);
+
+    function f_z(key) {
+        alert(key);
+    }
+
+    function f() {
+        return false;
+    }
+
 
 
     function callback(key){
@@ -33,6 +54,7 @@ $1 = $(function () {
 
     zyf_v.init_rule();
     $("#sub").click(function () {
+        zyf_v.check_order(f_z);
         console.log(zyf_v.serialize_format());
         return false;
     });
