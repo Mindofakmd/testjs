@@ -268,6 +268,7 @@
                                 }
                             } 
                         }
+
                         other_e.initRules();
                     });
                 }else if(rule.z_event == "change"){

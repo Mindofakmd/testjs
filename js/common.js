@@ -35,7 +35,6 @@ $1 = $(function () {
         another: "d",
         data: [["4", "1", "checked"]]
     }));
-
     zyf_v.add(new r({
         one: "d",
         another: "c",
