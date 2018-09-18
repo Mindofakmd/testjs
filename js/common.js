@@ -8,20 +8,20 @@ $1 = $(function () {
     //     another: "b",
     //     data: [["", "1,2", "avoid"]]
     // }));
-    var rule = {
-        one: "a",
-        another: "c",
-        data: [["1,2", "1,4", "checked"]]
-    };
-    var rule1 = {
-        one: "b",
-        another: "a",
-        data: [["4", "2", "checked"]]
-    };
-
-
-    zyf_v.add(new r(rule));
-    zyf_v.add(new r(rule1));
+    // var rule = {
+    //     one: "a",
+    //     another: "c",
+    //     data: [["1,2", "1,4", "checked"]]
+    // };
+    // var rule1 = {
+    //     one: "b",
+    //     another: "a",
+    //     data: [["4", "2", "checked"]]
+    // };
+    //
+    //
+    // zyf_v.add(new r(rule));
+    // zyf_v.add(new r(rule1));
 
 
     // zyf_v.add(new r({
@@ -32,25 +32,25 @@ $1 = $(function () {
 
     zyf_v.add(new r({
         one: "c",
-        another: "d",
-        data: [["4", "1", "checked"]]
-    }));
-    zyf_v.add(new r({
-        one: "d",
         another: "c",
-        func: callback,
-        data: [["1", "1", "if"]]
+        data: [["5", "1,2,3,4", "avoid"]]
     }));
-    zyf_v.add(new r({
-        one: "d",
-        another: "e",
-        data: [["1", "", "disabled"]]
-    }));
-    zyf_v.add(new r({
-        one: "d",
-        another: "e",
-        data: [["2", "", "enabled"]]
-    }));
+    // zyf_v.add(new r({
+    //     one: "d",
+    //     another: "c",
+    //     func: callback,
+    //     data: [["1", "1", "if"]]
+    // }));
+    // zyf_v.add(new r({
+    //     one: "d",
+    //     another: "e",
+    //     data: [["1", "", "disabled"]]
+    // }));
+    // zyf_v.add(new r({
+    //     one: "d",
+    //     another: "e",
+    //     data: [["2", "", "enabled"]]
+    // }));
 
 
 

@@ -26,6 +26,21 @@
                                     msg += "," + z;
                                 }
                             }
+                        }else{
+                            var xx = o[1].split(",");
+                            var success = false;
+                            for(var n=0;n<xx.length;n++){
+                                if(xx[n]==el.value()){
+                                    success = true;
+                                }
+                            }
+                            if(!success){
+                                if(msg==""){
+                                    msg += z;
+                                }else{
+                                    msg += "," + z;
+                                }
+                            }
                         }
                     }else if(o.length==4){
                         //"a !null b required"
@@ -41,6 +56,8 @@
                                             msg += "," + z;
                                         }
                                     }
+                                }else{
+
                                 }
                             }
                         }else if(o[1]=="!null"){
@@ -53,8 +70,12 @@
                                             msg += "," + z;
                                         }
                                     }
+                                }else{
+
                                 }
                             }
+                        }else{
+
                         }
                     }
                 }
@@ -268,7 +289,6 @@
                                 }
                             } 
                         }
-
                         other_e.initRules();
                     });
                 }else if(rule.z_event == "change"){
