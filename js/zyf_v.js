@@ -121,24 +121,24 @@
         };
         this.loadRules = function () {
             for(var i=0;i<this.rules.length;i++){
-                var rule = this.rules[i];
-                var other_e = this.elements.get(rule.another);
+                let rule = this.rules[i];
+                let other_e = this.elements.get(rule.another);
                 if(rule.basic){
                     if(rule.one()){
-                        other_e.updateRules(new s_rule("basic"+i,rule.data[0][1],rule.data[0][2]),"h");
+                        other_e.add_b(new s_rule("basic"+i,rule.data[0][1],rule.data[0][2]),"h");
                         other_e.initRules();
                     }
                     continue;
                 }
-                var element = this.elements.get(rule.one);
-                other_e.resetRules();
-                var val = element.value();
-                var vs = val.split(",");
-                for(var j=0;j<rule.data.length;j++){
-                    var effect = false;
-                    var rs = rule.data[j][0].split(",");
-                    for(var k=0;k<rs.length;k++){
-                        for(var y=0;y<vs.length;y++){
+                let element = this.elements.get(rule.one);
+                other_e.resetRules(rule.one);
+                let val = element.value();
+                let vs = val.split(",");
+                for(let j=0;j<rule.data.length;j++){
+                    let effect = false;
+                    let rs = rule.data[j][0].split(",");
+                    for(let k=0;k<rs.length;k++){
+                        for(let y=0;y<vs.length;y++){
                             if(vs[y] == rs[k]){
                                 effect = true;
                                 break;
@@ -159,12 +159,12 @@
                                     other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                             }
                         }else if (rule.data[j][2]=="if"){
-                            var _vs = element.value().split(",");
-                            var _rs = rule.data[j][1].split(",");
-                            var _c = true;
-                            for (var _j=0;_j<_rs.length;_j++){
-                                var _b = false;
-                                for (var _i=0;_i<_vs.length;_i++){
+                            let _vs = element.value().split(",");
+                            let _rs = rule.data[j][1].split(",");
+                            let _c = true;
+                            for (let _j=0;_j<_rs.length;_j++){
+                                let _b = false;
+                                for (let _i=0;_i<_vs.length;_i++){
                                     if(_rs[_j]==_vs[_i]){
                                         _b = true;
                                     }
@@ -175,7 +175,7 @@
                                 }
                             }
                             if(_c){
-                                rule.func(rule.one+"_"+rule.another);
+                                //rule.func(rule.one+"_"+rule.another+"_"+rule.data[j][0]);
                             }
 
                         }  else {
@@ -193,30 +193,33 @@
         };
         this.init_rule = function () {
             for(var i=0;i<this.rules.length;i++){
-                var rule = this.rules[i];
-                var other_e = this.elements.get(rule.another);
+                let rule = this.rules[i];
+                let other_e = this.elements.get(rule.another);
                 if(rule.basic){
                     if(rule.one){
                         if (rule.func){
                             rule.func();
                             continue;
                         }
-                        other_e.updateRules(new s_rule("basic"+i,rule.data[0][1],rule.data[0][2]),"h");
+                        other_e.add_b(new s_rule("basic"+i,rule.data[0][1],rule.data[0][2]),"h");
                         other_e.initRules();
                     }
                     continue;
                 }
-                var element = this.elements.get(rule.one);
+                let element = this.elements.get(rule.one);
                 if(rule.z_event == "click"){
-                    element.instance().click(function () {
-                        other_e.resetRules();
-                        var val = element.value();
-                        var vs = val.split(",");
+                    element.instance().click(function (event) {
+                        if(!event.originalEvent.isTrusted){
+                            event.preventDefault();
+                        }
+                        other_e.resetRules(rule.one);
+                        let val = element.value();
+                        let vs = val.split(",");
                         for(var j=0;j<rule.data.length;j++){
-                            var effect = false;
-                            var rs = rule.data[j][0].split(",");
-                            for(var k=0;k<rs.length;k++){
-                                for(var y=0;y<vs.length;y++){
+                            let effect = false;
+                            let rs = rule.data[j][0].split(",");
+                            for(let k=0;k<rs.length;k++){
+                                for(let y=0;y<vs.length;y++){
                                     if(vs[y] == rs[k]){
                                         effect = true;
                                         break;
@@ -237,12 +240,12 @@
                                             other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                                     }
                                 }else if (rule.data[j][2]=="if"){
-                                    var _vs = element.value().split(",");
-                                    var _rs = rule.data[j][1].split(",");
-                                    var _c = true;
-                                    for (var _j=0;_j<_rs.length;_j++){
-                                        var _b = false;
-                                        for (var _i=0;_i<_vs.length;_i++){
+                                    let _vs = other_e.value().split(",");
+                                    let _rs = rule.data[j][1].split(",");
+                                    let _c = true;
+                                    for (let _j=0;_j<_rs.length;_j++){
+                                        let _b = false;
+                                        for (let _i=0;_i<_vs.length;_i++){
                                             if(_rs[_j]==_vs[_i]){
                                                 _b = true;
                                             }
@@ -253,7 +256,7 @@
                                         }
                                     }
                                     if(_c){
-                                        rule.func(rule.one+"_"+rule.another);
+                                        rule.func(rule.one+"_"+rule.another+"_"+rule.data[j][0]);
                                     }
 
                                 }  else {
@@ -269,14 +272,14 @@
                     });
                 }else if(rule.z_event == "change"){
                     element.instance().change(function () {
-                        other_e.resetRules();
-                        var val = element.value();
-                        var vs = val.split(",");
-                        for(var j=0;j<rule.data.length;j++){
-                            var effect = false;
-                            var rs = rule.data[j][0].split(",");
-                            for(var k=0;k<rs.length;k++){
-                                for(var y=0;y<vs.length;y++){
+                        other_e.resetRules(rule.one);
+                        let val = element.value();
+                        let vs = val.split(",");
+                        for(let j=0;j<rule.data.length;j++){
+                            let effect = false;
+                            let rs = rule.data[j][0].split(",");
+                            for(let k=0;k<rs.length;k++){
+                                for(let y=0;y<vs.length;y++){
                                     if(vs[y] == rs[k]){
                                         effect = true;
                                         break;
@@ -297,23 +300,23 @@
                                             other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
                                     }
                                 }else if (rule.data[j][2]=="if"){
-                                    var _vs = element.value().split(",");
-                                    var _rs = rule.data[j][1].split(",");
-                                    var _c = true;
-                                    for (var _j=0;_j<_rs.length;_j++){
-                                        var _b = false;
-                                        for (var _i=0;_i<_vs.length;_i++){
+                                    let _vs = other_e.value().split(",");
+                                    let _rs = rule.data[j][1].split(",");
+                                    let _c = true;
+                                    for (let _j=0;_j<_rs.length;_j++){
+                                        let _b = false;
+                                        for (let _i=0;_i<_vs.length;_i++){
                                             if(_rs[_j]==_vs[_i]){
                                                 _b = true;
                                             }
                                         }
                                         if(!_b){
                                             _c = false;
-                                            break;
+                                            continue;
                                         }
                                     }
                                     if(_c){
-                                        rule.func(rule.one+"_"+rule.another);
+                                        rule.func(rule.one+"_"+rule.another+"_"+rule.data[j][0]);
                                     }
 
                                 }else {
@@ -359,6 +362,9 @@
     function element(){
         this.elements = new Array();
         this.def_value = "";
+        this.get_def_v = function(){
+          return this.def_value;
+        };
         this.name = "";
         this.id = "";
         this.tagName = "";
@@ -366,19 +372,28 @@
         this.z_model = "";
         this.z_row = "";
         this.rules = new Array();
+        this.basic_r = new Array();
         this.instance = function(){//返回jquery对象
             var ins = $("[name='"+this.name+"']");
             return ins;
         };
-
-        this.fill = function (str,boo) {
+        this.add_b = function(rule){
+            this.basic_r.push(rule);
+        };
+        this.fill = function (str,boo,coo) {
             if(this.tagName=="INPUT"){
                 if(this.z_type=="nothing"){
                     this.instance().val(str);
+                    if(boo){
+                        this.instance().attr("disabled",true);
+                    }
                 }else if(this.z_type=="single"){
                     for(var i=0;i<this.elements.length;i++){
                         if(this.elements[i].value==str){
                             this.elements[i].checked = true;
+                            if(coo){
+                                this.elements[i].click();
+                            }
                             if(boo){
                                 this.elements[i].disabled = true;
                             }
@@ -391,9 +406,14 @@
                         for(var j=0;j<ss.length;j++){
                             if(ss[j]==this.elements[i].value){
                                 this.elements[i].checked = true;
+                                this.def_value = this.value();
+                                if(coo){
+                                    this.elements[i].click();
+                                }
                                 if(boo){
                                     this.elements[i].disabled = true;
                                 }
+                                this.def_value = "";
                                 continue;
                             }
                         }
@@ -403,10 +423,12 @@
                 for(var i=0;i<this.elements.length;i++){
                     if(this.elements[i].value==str){
                         this.elements[i].selected = true;
+                        if(coo){
+                            this.elements[i].onchange();
+                        }
                         if(boo){
                             this.elements[i].disabled = true;
                         }
-                        break;
                     }
                 }
             }else{
@@ -471,10 +493,14 @@
                     this.show();
                 }else if(l_rules[x].ctrl=="hide"){
                     this.hide();
+                }else if(l_rules[x].ctrl=="disabled"){
+                    this.disabled();
+                }else if(l_rules[x].ctrl=="enabled"){
+                    this.enabled();
                 }else if(l_rules[x].ctrl=="onlycheck"){
-                    this.fill(l_rules[x].value);
+                    this.fill(l_rules[x].value,false,true);
                 }else if(l_rules[x].ctrl=="checked"){
-                    this.fill(l_rules[x].value,true);
+                    this.fill(l_rules[x].value,true,true);
                 }else{
                     var rs = l_rules[x].value.split(",");
                     for(var y=0;y<rs.length;y++){
@@ -495,10 +521,14 @@
                     this.show();
                 }else if(m_rules[x].ctrl=="hide"){
                     this.hide();
+                }else if(m_rules[x].ctrl=="disabled"){
+                    this.disabled();
+                }else if(m_rules[x].ctrl=="enabled"){
+                    this.enabled();
                 }else if(m_rules[x].ctrl=="onlycheck"){
-                    this.fill(m_rules[x].value);
+                    this.fill(m_rules[x].value,false,true);
                 }else if(m_rules[x].ctrl=="checked"){
-                    this.fill(m_rules[x].value,true);
+                    this.fill(m_rules[x].value,true,true);
                 }else{
                     var rs = m_rules[x].value.split(",");
                     for(var y=0;y<rs.length;y++){
@@ -519,10 +549,14 @@
                     this.show();
                 }else if(h_rules[x].ctrl=="hide"){
                     this.hide();
+                }else if(h_rules[x].ctrl=="disabled"){
+                    this.disabled();
+                }else if(h_rules[x].ctrl=="enabled"){
+                    this.enabled();
                 }else if(h_rules[x].ctrl=="onlycheck"){
-                    this.fill(h_rules[x].value);
+                    this.fill(h_rules[x].value,false,true);
                 }else if(h_rules[x].ctrl=="checked"){
-                    this.fill(h_rules[x].value,true);
+                    this.fill(h_rules[x].value,true,true);
                 }else{
                     var rs = h_rules[x].value.split(",");
                     for(var y=0;y<rs.length;y++){
@@ -538,8 +572,43 @@
                     }
                 }
             }
-
+            var b_rules = this.basic_r;
+            for(var x=0;x<b_rules.length;x++){
+                if(b_rules[x].ctrl=="show"){
+                    this.show();
+                }else if(b_rules[x].ctrl=="hide"){
+                    this.hide();
+                }else if(b_rules[x].ctrl=="disabled"){
+                    this.disabled();
+                }else if(b_rules[x].ctrl=="enabled"){
+                    this.enabled();
+                }else if(b_rules[x].ctrl=="onlycheck"){
+                    this.fill(b_rules[x].value);
+                }else if(b_rules[x].ctrl=="checked"){
+                    this.fill(b_rules[x].value,true);
+                }else{
+                    var rs = b_rules[x].value.split(",");
+                    for(var y=0;y<rs.length;y++){
+                        for(var z=0;z<this.elements.length;z++){
+                            if(rs[y]==this.elements[z].value){
+                                if(this.tagName=="SELECT")
+                                    this.elements[z].selected = false;
+                                else
+                                    this.elements[z].checked = false;
+                                this.elements[z].disabled = true;
+                            }
+                        }
+                    }
+                }
+            }
         };
+        this.disabled = function () {
+            this.instance().val("");
+            this.instance().attr("disabled",true);
+        };
+        this.enabled = function () {
+            this.instance().attr("disabled",false);
+        }
         this.updateRules = function(rule){
             if(this.rules.length==0){
                 this.rules[0] = rule;
@@ -577,13 +646,19 @@
             }
             //this.initRules();
         };
-        this.resetRules = function(){
-            this.rules.splice(0,this.rules.length);
+        this.resetRules = function(key){
+            for(var o=0;o<this.rules.length;o++){
+                var k = this.rules[o].key;
+                if(k==(key+"avoid")||k==(key+"if")||k==(key+"checked")||k==(key+"onlycheck")
+                    ||k==(key+"show")||k==(key+"hide")||k==(key+"disabled")||k==(key+"enabled")){
+                    this.rules[o].value = "";
+                }
+            }
 
         };
         this.value = function(){
-            if(this.def_value!=""){
-                return this.def_value;
+            if(this.get_def_v()!=""){
+                return this.get_def_v();
             }
             if(this.id){
                 return $("#" + this.id).val();
@@ -620,10 +695,6 @@
     }
 
     function rule(obj){
-        if(!obj.one){
-            console.error("缺少one属性");
-            return;
-        }
         if(!obj.another){
             console.error("another");
             return;
