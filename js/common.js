@@ -27,9 +27,8 @@ $1 = $(function () {
 
     zyf_v.add(new r({
         basic: true,
-        one: f,
+        one: 5>10,//可以放表达式
         another: "b",
-        func: callback,
         data: [["", "1,2", "avoid"]]
     }));
 
@@ -40,10 +39,6 @@ $1 = $(function () {
 
     function f_z(key) {
         alert(key);
-    }
-
-    function f() {
-        return false;
     }
 
 

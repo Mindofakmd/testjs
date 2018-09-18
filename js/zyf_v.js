@@ -13,7 +13,7 @@
                 var order = this.orders[z];
                 var os = order.split("|");
                 if(os.length>1){
-
+                    //还没完成呢
                 }else{
                     var o = order.split(" ");
                     if(o.length==2){
@@ -90,8 +90,8 @@
         this.serialize = function () {
           var ls = this.elements.list();
           var ser = "{";
-          for (var i=0;i<ls.length;i++){
-              if(i!=(ls.length-1))
+          for (var i=0;i<ls.length-1;i++){
+              if(i!=(ls.length-2))
                   ser += "'"+ls[i].key + "':'" + ls[i].value.value() + "',";
               else
                   ser += "'"+ls[i].key + "':'" + ls[i].value.value()+"'";
@@ -122,8 +122,15 @@
         this.loadRules = function () {
             for(var i=0;i<this.rules.length;i++){
                 var rule = this.rules[i];
-                var element = this.elements.get(rule.one);
                 var other_e = this.elements.get(rule.another);
+                if(rule.basic){
+                    if(rule.one()){
+                        other_e.updateRules(new s_rule("basic"+i,rule.data[0][1],rule.data[0][2]),"h");
+                        other_e.initRules();
+                    }
+                    continue;
+                }
+                var element = this.elements.get(rule.one);
                 other_e.resetRules();
                 var val = element.value();
                 var vs = val.split(",");
@@ -189,7 +196,11 @@
                 var rule = this.rules[i];
                 var other_e = this.elements.get(rule.another);
                 if(rule.basic){
-                    if(rule.one()){
+                    if(rule.one){
+                        if (rule.func){
+                            rule.func();
+                            continue;
+                        }
                         other_e.updateRules(new s_rule("basic"+i,rule.data[0][1],rule.data[0][2]),"h");
                         other_e.initRules();
                     }
@@ -338,11 +349,16 @@
                     }
                 }
             });
+            var def_el = new element();
+            def_el.name = "__$d__";
+            def_el.def_value = "__def_value__";
+            es.put(def_el.name,def_el);
         }
     }
 
     function element(){
         this.elements = new Array();
+        this.def_value = "";
         this.name = "";
         this.id = "";
         this.tagName = "";
@@ -566,6 +582,9 @@
 
         };
         this.value = function(){
+            if(this.def_value!=""){
+                return this.def_value;
+            }
             if(this.id){
                 return $("#" + this.id).val();
             }
@@ -681,6 +700,11 @@
         return {"key":key,"value":value,"level":level,"ctrl":ctrl};
     }
 
+    function gift(){
+        return {"name":"__$d__","value":"__def_value__"};
+    }
+
+    window.gift = gift;
     window._$z = _$z;
     window.r = rule;
 
