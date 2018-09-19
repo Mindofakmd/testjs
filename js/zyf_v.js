@@ -129,6 +129,9 @@
         this.deserialize_format = function (data) {
             for(var x in data){
                 var es = this.s_obj.get(x);
+                if(!es){
+                    continue;
+                }
                 var ds = data[x];
                 for(var r=0;r<es.length;r++){
                     for(var o in ds){
@@ -142,217 +145,222 @@
         };
         this.loadRules = function () {
             for(var i=0;i<this.rules.length;i++){
-                let rule = this.rules[i];
-                let other_e = this.elements.get(rule.another);
-                if(rule.basic){
-                    if(rule.one()){
-                        other_e.add_b(new s_rule("basic"+i,rule.data[0][1],rule.data[0][2]),"h");
-                        other_e.initRules();
-                    }
-                    continue;
-                }
-                let element = this.elements.get(rule.one);
-                other_e.resetRules(rule.one);
-                let val = element.value();
-                let vs = val.split(",");
-                for(let j=0;j<rule.data.length;j++){
-                    let effect = false;
-                    let rs = rule.data[j][0].split(",");
-                    for(let k=0;k<rs.length;k++){
-                        for(let y=0;y<vs.length;y++){
-                            if(vs[y] == rs[k]){
-                                effect = true;
-                                break;
+                (function(rule,els){
+                    var other_e = els.get(rule.another);
+                    if(rule.basic){
+                        if(rule.one){
+                            if (rule.func){
+                                rule.func();
+                                return;
                             }
+                            other_e.add_b(new s_rule("basic"+i,rule.data[0][1],rule.data[0][2]),"h");
+                            other_e.initRules();
                         }
+                        return;
                     }
-                    if (effect){
-                        if (rule.data[j][2]=="avoid"){
-                            if (element.z_type == "single"){
-                                if(rule.data[j].length==4){
-                                    other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
-                                }else
-                                    other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
-                            } else if (element.z_type=="multi") {
-                                if(rule.data[j].length==4) {
-                                    other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
-                                }else
-                                    other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
-                            }
-                        }else if (rule.data[j][2]=="if"){
-                            let _vs = element.value().split(",");
-                            let _rs = rule.data[j][1].split(",");
-                            let _c = true;
-                            for (let _j=0;_j<_rs.length;_j++){
-                                let _b = false;
-                                for (let _i=0;_i<_vs.length;_i++){
-                                    if(_rs[_j]==_vs[_i]){
-                                        _b = true;
-                                    }
-                                }
-                                if(!_b){
-                                    _c = false;
+                    var element = els.get(rule.one);
+                    other_e.resetRules(rule.one);
+                    var val = element.value();
+                    var vs = val.split(",");
+                    for(var j=0;j<rule.data.length;j++){
+                        var effect = false;
+                        var rs = rule.data[j][0].split(",");
+                        for(var k=0;k<rs.length;k++){
+                            for(var y=0;y<vs.length;y++){
+                                if(vs[y] == rs[k]){
+                                    effect = true;
                                     break;
                                 }
                             }
-                            if(_c){
-                                //rule.func(rule.one+"_"+rule.another+"_"+rule.data[j][0]);
-                            }
+                        }
+                        if (effect){
+                            if (rule.data[j][2]=="avoid"){
+                                if (element.z_type == "single"){
+                                    if(rule.data[j].length==4){
+                                        other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
+                                    }else
+                                        other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
+                                } else if (element.z_type=="multi") {
+                                    if(rule.data[j].length==4) {
+                                        other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
+                                    }else
+                                        other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
+                                }
+                            }else if (rule.data[j][2]=="if"){
+                                var _vs = element.value().split(",");
+                                var _rs = rule.data[j][1].split(",");
+                                var _c = true;
+                                for (var _j=0;_j<_rs.length;_j++){
+                                    var _b = false;
+                                    for (var _i=0;_i<_vs.length;_i++){
+                                        if(_rs[_j]==_vs[_i]){
+                                            _b = true;
+                                        }
+                                    }
+                                    if(!_b){
+                                        _c = false;
+                                        break;
+                                    }
+                                }
+                                if(_c){
+                                    //rule.func(rule.one+"_"+rule.another+"_"+rule.data[j][0]);
+                                }
 
-                        }  else {
-                            if(rule.data[j].length==4) {
-                                other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
-                            }else{
-                                other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
+                            }  else {
+                                if(rule.data[j].length==4) {
+                                    other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
+                                }else{
+                                    other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
+                                }
                             }
                         }
                     }
-                }
-                other_e.initRules();
-
+                    other_e.initRules();
+                })(this.rules[i],this.elements);
             }
         };
         this.init_rule = function () {
             for(var i=0;i<this.rules.length;i++){
-                let rule = this.rules[i];
-                let other_e = this.elements.get(rule.another);
-                if(rule.basic){
-                    if(rule.one){
-                        if (rule.func){
-                            rule.func();
-                            continue;
-                        }
-                        other_e.add_b(new s_rule("basic"+i,rule.data[0][1],rule.data[0][2]),"h");
-                        other_e.initRules();
-                    }
-                    continue;
-                }
-                let element = this.elements.get(rule.one);
-                if(rule.z_event == "click"){
-                    element.instance().click(function (event) {
-                        if(!event.originalEvent.isTrusted){
-                            event.preventDefault();
-                        }
-                        other_e.resetRules(rule.one);
-                        let val = element.value();
-                        let vs = val.split(",");
-                        for(var j=0;j<rule.data.length;j++){
-                            let effect = false;
-                            let rs = rule.data[j][0].split(",");
-                            for(let k=0;k<rs.length;k++){
-                                for(let y=0;y<vs.length;y++){
-                                    if(vs[y] == rs[k]){
-                                        effect = true;
-                                        break;
-                                    }
-                                }
+                (function(rule,els){
+                    var other_e = els.get(rule.another);
+                    if(rule.basic){
+                        if(rule.one){
+                            if (rule.func){
+                                rule.func();
+                                return;
                             }
-                            if (effect){
-                                if (rule.data[j][2]=="avoid"){
-                                    if (element.z_type == "single"){
-                                        if(rule.data[j].length==4){
-                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
-                                        }else
-                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
-                                    } else if (element.z_type=="multi") {
-                                        if(rule.data[j].length==4) {
-                                            other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
-                                        }else
-                                            other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
-                                    }
-                                }else if (rule.data[j][2]=="if"){
-                                    let _vs = other_e.value().split(",");
-                                    let _rs = rule.data[j][1].split(",");
-                                    let _c = true;
-                                    for (let _j=0;_j<_rs.length;_j++){
-                                        let _b = false;
-                                        for (let _i=0;_i<_vs.length;_i++){
-                                            if(_rs[_j]==_vs[_i]){
-                                                _b = true;
-                                            }
-                                        }
-                                        if(!_b){
-                                            _c = false;
+                            other_e.add_b(new s_rule("basic"+i,rule.data[0][1],rule.data[0][2]),"h");
+                            other_e.initRules();
+                        }
+                        return;
+                    }
+                    var element = els.get(rule.one);
+                    if(rule.z_event == "click"){
+                        element.instance().click(function (event) {
+                            if(!event.originalEvent.isTrusted){
+                                event.preventDefault();
+                            }
+                            other_e.resetRules(rule.one);
+                            var val = element.value();
+                            var vs = val.split(",");
+                            for(var j=0;j<rule.data.length;j++){
+                                var effect = false;
+                                var rs = rule.data[j][0].split(",");
+                                for(var k=0;k<rs.length;k++){
+                                    for(var y=0;y<vs.length;y++){
+                                        if(vs[y] == rs[k]){
+                                            effect = true;
                                             break;
                                         }
                                     }
-                                    if(_c){
-                                        rule.func(rule.one+"_"+rule.another+"_"+rule.data[j][0]);
-                                    }
-
-                                }  else {
-                                    if(rule.data[j].length==4) {
-                                        other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
-                                    }else{
-                                        other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
-                                    }
                                 }
-                            } 
-                        }
-                        other_e.initRules();
-                    });
-                }else if(rule.z_event == "change"){
-                    element.instance().change(function () {
-                        other_e.resetRules(rule.one);
-                        let val = element.value();
-                        let vs = val.split(",");
-                        for(let j=0;j<rule.data.length;j++){
-                            let effect = false;
-                            let rs = rule.data[j][0].split(",");
-                            for(let k=0;k<rs.length;k++){
-                                for(let y=0;y<vs.length;y++){
-                                    if(vs[y] == rs[k]){
-                                        effect = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (effect){
-                                if (rule.data[j][2]=="avoid"){
-                                    if (element.z_type == "single"){
-                                        if(rule.data[j].length==4){
-                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
-                                        }else
-                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
-                                    } else if (element.z_type=="multi") {
-                                        if(rule.data[j].length==4) {
-                                            other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
-                                        }else
-                                            other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
-                                    }
-                                }else if (rule.data[j][2]=="if"){
-                                    let _vs = other_e.value().split(",");
-                                    let _rs = rule.data[j][1].split(",");
-                                    let _c = true;
-                                    for (let _j=0;_j<_rs.length;_j++){
-                                        let _b = false;
-                                        for (let _i=0;_i<_vs.length;_i++){
-                                            if(_rs[_j]==_vs[_i]){
-                                                _b = true;
+                                if (effect){
+                                    if (rule.data[j][2]=="avoid"){
+                                        if (element.z_type == "single"){
+                                            if(rule.data[j].length==4){
+                                                other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
+                                            }else
+                                                other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
+                                        } else if (element.z_type=="multi") {
+                                            if(rule.data[j].length==4) {
+                                                other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
+                                            }else
+                                                other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
+                                        }
+                                    }else if (rule.data[j][2]=="if"){
+                                        var _vs = other_e.value().split(",");
+                                        var _rs = rule.data[j][1].split(",");
+                                        var _c = true;
+                                        for (var _j=0;_j<_rs.length;_j++){
+                                            var _b = false;
+                                            for (var _i=0;_i<_vs.length;_i++){
+                                                if(_rs[_j]==_vs[_i]){
+                                                    _b = true;
+                                                }
+                                            }
+                                            if(!_b){
+                                                _c = false;
+                                                break;
                                             }
                                         }
-                                        if(!_b){
-                                            _c = false;
-                                            continue;
+                                        if(_c){
+                                            rule.func(rule.one+"_"+rule.another+"_"+rule.data[j][0]);
                                         }
-                                    }
-                                    if(_c){
-                                        rule.func(rule.one+"_"+rule.another+"_"+rule.data[j][0]);
-                                    }
 
-                                }else {
-                                    if(rule.data[j].length==4) {
-                                        other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
-                                    }else{
-                                        other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
+                                    }  else {
+                                        if(rule.data[j].length==4) {
+                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
+                                        }else{
+                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
+                                        }
                                     }
                                 }
                             }
-                        }
+                            other_e.initRules();
+                        });
+                    }else if(rule.z_event == "change"){
+                        element.instance().change(function () {
+                            other_e.resetRules(rule.one);
+                            var val = element.value();
+                            var vs = val.split(",");
+                            for(var j=0;j<rule.data.length;j++){
+                                var effect = false;
+                                var rs = rule.data[j][0].split(",");
+                                for(var k=0;k<rs.length;k++){
+                                    for(var y=0;y<vs.length;y++){
+                                        if(vs[y] == rs[k]){
+                                            effect = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (effect){
+                                    if (rule.data[j][2]=="avoid"){
+                                        if (element.z_type == "single"){
+                                            if(rule.data[j].length==4){
+                                                other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
+                                            }else
+                                                other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
+                                        } else if (element.z_type=="multi") {
+                                            if(rule.data[j].length==4) {
+                                                other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
+                                            }else
+                                                other_e.updateRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
+                                        }
+                                    }else if (rule.data[j][2]=="if"){
+                                        var _vs = other_e.value().split(",");
+                                        var _rs = rule.data[j][1].split(",");
+                                        var _c = true;
+                                        for (var _j=0;_j<_rs.length;_j++){
+                                            var _b = false;
+                                            for (var _i=0;_i<_vs.length;_i++){
+                                                if(_rs[_j]==_vs[_i]){
+                                                    _b = true;
+                                                }
+                                            }
+                                            if(!_b){
+                                                _c = false;
+                                                continue;
+                                            }
+                                        }
+                                        if(_c){
+                                            rule.func(rule.one+"_"+rule.another+"_"+rule.data[j][0]);
+                                        }
 
-                    });
-                    other_e.initRules();
-                }
+                                    }else {
+                                        if(rule.data[j].length==4) {
+                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2],rule.data[j][3]));
+                                        }else{
+                                            other_e.replaceRules(new s_rule(rule.one+rule.data[j][2],rule.data[j][1],rule.data[j][2]));
+                                        }
+                                    }
+                                }
+                            }
+                            other_e.initRules();
+                        });
+
+                    }
+                })(this.rules[i],this.elements);
             }
         };
         this.init = function(){
@@ -481,8 +489,12 @@
                 this.instance().find("option").each(function () {
                     es.push(this);
                 });
-                this.z_type = "single";
-                this.id = obj.id;
+                if(obj.multiple){
+                    this.z_type = "multi";
+                }else{
+                    this.z_type = "single";
+                    this.id = obj.id;
+                }
             }else{
                 this.z_type = "nothing";
                 this.id = obj.id;
@@ -682,7 +694,11 @@
                 return this.get_def_v();
             }
             if(this.id){
-                return $("#" + this.id).val();
+                var v = $("#" + this.id).val();
+                if(v==null){
+                    v = "";
+                }
+                return v.toString();
             }
             var val = "";
             for(var i=0;i<this.elements.length;i++){
