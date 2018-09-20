@@ -90,20 +90,29 @@
             var ser = "{";
             var ll = this.s_obj.list();
             for(var i=0;i<ll.length;i++){
+                if(ll[i].key=="self_obj_zyf"){
+                    var zzz = ll[i].value[0];
+                    if(i!=(ll.length-1))
+                        ser += "\""+ zzz.name + "\":" + zzz.value() + ",";
+                    else
+                        ser += "\""+ zzz.name + "\":" + zzz.value();
+
+                    continue;
+                }
                 var sv = ll[i].value;
                 var s_s = "{";
                 for(var j=0;j<sv.length;j++){
                     if(j!=(sv.length-1))
-                        s_s += "'"+sv[j].name + "':'" + sv[j].value() + "',";
+                        s_s += "\""+sv[j].name + "\":\"" + sv[j].value() + "\",";
                     else
-                        s_s += "'"+sv[j].name + "':'" + sv[j].value()+"'";
+                        s_s += "\""+sv[j].name + "\":\"" + sv[j].value()+"\"";
                 }
                 s_s += "}"
 
                 if(i!=(ll.length-1))
-                    ser += "'"+ll[i].key + "':" + s_s + ",";
+                    ser += "\""+ll[i].key + "\":" + s_s + ",";
                 else
-                    ser += "'"+ll[i].key + "':" + s_s;
+                    ser += "\""+ll[i].key + "\":" + s_s;
             }
             ser += "}"
             return ser;
@@ -129,10 +138,20 @@
         this.deserialize_format = function (data) {
             for(var x in data){
                 var es = this.s_obj.get(x);
-                if(!es){
-                    continue;
-                }
                 var ds = data[x];
+                if(!es){
+                    es = this.s_obj.get("self_obj_zyf");
+                    if(!es){
+                        continue;
+                    }else{
+                        for(var r=0;r<es.length;r++){
+                            if(es[r].name == x){
+                                es[r].fill(ds);
+                                break;
+                            }
+                        }
+                    }
+                }
                 for(var r=0;r<es.length;r++){
                     for(var o in ds){
                         if(es[r].name == o){
@@ -371,14 +390,18 @@
                 var el = new element();
                 el.init(this);
                 if(el.name!=""&&el.name!=null){
-                    es.put(el.name,el);
-                    var z_model = el.z_model;
-                    var arr = so.get(z_model);
-                    if(arr){
-                        arr.push(el);
+                    if(es.get(el.name)){
+
                     }else{
-                        so.put(z_model,[el]);
+                        var z_model = el.z_model;
+                        var arr = so.get(z_model);
+                        if(arr){
+                            arr.push(el);
+                        }else{
+                            so.put(z_model,[el]);
+                        }
                     }
+                    es.put(el.name,el);
                 }
             });
             var def_el = new element();
@@ -471,7 +494,7 @@
             this.z_row = obj.getAttribute("z_row");
             var es = this.elements;
             if(obj.tagName=="INPUT"){
-                if(obj.type == "text"||obj.type == "password"){
+                if(obj.type == "text"||obj.type == "password"||obj.type == "hidden"|| obj.type == "date"){
                     this.z_type = "nothing";
                     this.id = obj.id;
                 }else if(obj.type == "radio"){
