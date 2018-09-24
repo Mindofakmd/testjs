@@ -32,8 +32,8 @@ $1 = $(function () {
 
     zyf_v.add(new r({
         one: "c",
-        another: "c",
-        data: [["5", "1,2,3,4", "avoid"]]
+        another: "f",
+        data: [["5", "3", "onlycheck"]]
     }));
 
     zyf_v.add(new r({
@@ -79,6 +79,9 @@ $1 = $(function () {
     // }
 
     zyf_v.init_rule();
+    $("#f").change(function(){
+        alert(1);
+    });
     $("#sub").click(function () {
         console.log()
         //zyf_v.check_order(f_z);

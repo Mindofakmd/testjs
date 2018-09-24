@@ -382,6 +382,10 @@
                 })(this.rules[i],this.elements);
             }
         };
+        this.update_element = function (e_name) {//慎用
+            var el = this.elements.get(e_name);
+            el.init(el.instance()[0]);
+        };
         this.init = function(){
             var $all =  $('input,select,textarea');
             var es = this.elements;
@@ -433,6 +437,9 @@
             this.basic_r.push(rule);
         };
         this.fill = function (str,boo,coo) {
+            if(!str){
+                return;
+            }
             if(this.tagName=="INPUT"){
                 if(this.z_type=="nothing"){
                     this.instance().val(str);
@@ -454,7 +461,7 @@
                     }
                 }else if(this.z_type=="multi"){
                     for(var i=0;i<this.elements.length;i++){
-                        var ss = str.split(",");
+                        var ss = String(str).split(",");
                         for(var j=0;j<ss.length;j++){
                             if(ss[j]==this.elements[i].value){
                                 this.elements[i].checked = true;
@@ -472,14 +479,17 @@
                     }
                 }
             }else if(this.tagName=="SELECT"){
+                var ss = String(str).split(",");
                 for(var i=0;i<this.elements.length;i++){
-                    if(this.elements[i].value==str){
-                        this.elements[i].selected = true;
-                        if(coo){
-                            this.elements[i].onchange();
-                        }
-                        if(boo){
-                            this.elements[i].disabled = true;
+                    for(var q=0;q<ss.length;q++){
+                        if(this.elements[i].value==ss[q]){
+                            this.elements[i].selected = true;
+                            if(coo){
+                                $(this.elements[i]).change();
+                            }
+                            if(boo){
+                                this.elements[i].disabled = true;
+                            }
                         }
                     }
                 }
