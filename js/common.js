@@ -2,17 +2,17 @@ let $1;
 $1 = $(function () {
     var zyf_v = _$z();
     zyf_v.init();
-    zyf_v.add(new r({
-        basic: true,
-        one: 11>10,//可以放表达式
-        another: "b",
-        data: [["", "1,2", "avoid"]]
-    }));
-    var rule = {
-        one: "a",
-        another: "c",
-        data: [["1,2", "1,2", "avoid"]]
-    };
+    // zyf_v.add(new r({
+    //     basic: true,
+    //     one: 11>10,//可以放表达式
+    //     another: "b",
+    //     data: [["", "1,2", "avoid"]]
+    // }));
+    // var rule = {
+    //     one: "a",
+    //     another: "c",
+    //     data: [["1,2", "1,2", "avoid"]]
+    // };
     // var rule1 = {
     //     one: "b",
     //     another: "a",
@@ -20,7 +20,7 @@ $1 = $(function () {
     // };
     //
     //
-    zyf_v.add(new r(rule));
+    // zyf_v.add(new r(rule));
     // zyf_v.add(new r(rule1));
 
 
@@ -30,17 +30,17 @@ $1 = $(function () {
     //     data: [["1", "1", "checked"], ["2", "2", "onlycheck"]]
     // }));
 
-    zyf_v.add(new r({
-        one: "c",
-        another: "f",
-        data: [["5", "3", "onlycheck"]]
-    }));
-
-    zyf_v.add(new r({
-        one: "g",
-        another: "c",
-        data: [["1,2,3", "1", "avoid"]]
-    }));
+    // zyf_v.add(new r({
+    //     one: "c",
+    //     another: "f",
+    //     data: [["5", "3", "onlycheck"]]
+    // }));
+    //
+    // zyf_v.add(new r({
+    //     one: "g",
+    //     another: "c",
+    //     data: [["1,2,3", "1", "avoid"]]
+    // }));
     // zyf_v.add(new r({
     //     one: "d",
     //     another: "c",
@@ -77,7 +77,7 @@ $1 = $(function () {
     //         alert(key);
     //     zzz = false;
     // }
-
+    zyf_v.add_order("a is 1 b exclude 1,2")
     zyf_v.init_rule();
     $("#f").change(function(){
         alert(1);
@@ -86,6 +86,7 @@ $1 = $(function () {
         console.log()
         //zyf_v.check_order(f_z);
         //console.log(zyf_v.serialize_format());
+        zyf_v.check_order(f_z);
         return false;
     });
     //zyf_v.deserialize({'a':'1','b':'2','c':'1,4','d':'1,3,5'});

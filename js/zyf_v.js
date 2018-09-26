@@ -7,75 +7,127 @@
         this.add_order = function(order){
             this.orders.push(order);
         };
+        this.apply_order = function (o3) {
+            //{name1 not null name2 contain 1,2}
+            //第二个关键字 not is contain exclude
+            var el = this.elements.get(o3[0]);
+            if(o3[1]=="is"){
+                if(o3[2]=="null"){
+                    if(el.value()==""||el.value()==null){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }else{
+                    if(el.value()==o3[2]){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }
+            }else if(o3[1]=="not"){
+                if(o3[2]=="null"){
+                    if(el.value()==""||el.value()==null){
+                        return false;
+                    }else{
+                        return true;
+                    }
+                }else{
+                    if(el.value()==o3[2]){
+                        return false;
+                    }else{
+                        return true;
+                    }
+                }
+            }else if(o3[1]=="contain"){
+                var vs = o3[2].split(",");
+                var vals = el.value().split(",");
+                for(var x=0;x<vs.length;x++){
+                    for(var y=0;y<vals.length;y++){
+                        if(vs[x]==vals[y]){
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }else{
+                var vs = o3[2].split(",");
+                var vazs = el.value().split(",");
+                for(var x=0;x<vs.length;x++){
+                    for(var y=0;y<vazs.length;y++){
+                        if(vs[x]==vazs[y]){
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        };
+        this.self_use = function(os){
+            if(os.indexOf(" and ")!=-1){
+                var oss = os.split(" and ");
+                var success = true;
+                for(var tt=0;tt<oss.length;tt++){
+                    var test = this.apply_order(oss[tt].split(" "));
+                    success = success&&test;
+                }
+                return success;
+            }else{
+                var oss = os.split(" or ");
+                var success = false;
+                for(var tt=0;tt<oss.length;tt++){
+                    var test = this.apply_order(oss[tt].split(" "));
+                    success = success||test;
+                }
+                return success;
+            }
+        };
         this.check_order = function(func){
             var msg = "";
             for(var z=0;z<this.orders.length;z++){
                 var order = this.orders[z];
+                //{name1 not null or name3 is 3|name2 contain 1,2}
                 var os = order.split("|");
                 if(os.length>1){
                     //还没完成呢
-                }else{
-                    var o = order.split(" ");
-                    if(o.length==2){
-                        var el = this.elements.get(o[0]);
-                        if(o[1]=="required"){
-                            if(el.value()==""||el.value()==null){
-                                if(msg==""){
-                                    msg += z;
-                                }else{
-                                    msg += "," + z;
-                                }
-                            }
-                        }else{
-                            var xx = o[1].split(",");
-                            var success = false;
-                            for(var n=0;n<xx.length;n++){
-                                if(xx[n]==el.value()){
-                                    success = true;
-                                }
-                            }
-                            if(!success){
-                                if(msg==""){
-                                    msg += z;
-                                }else{
-                                    msg += "," + z;
-                                }
+                    if(this.self_use(os[0])){
+                        if(!this.self_use(os[1])){
+                            if(msg==""){
+                                msg += z;
+                            }else{
+                                msg += "," + z;
                             }
                         }
-                    }else if(o.length==4){
-                        //"a !null b required"
-                        e1 = this.elements.get(o[0]);
-                        e2 = this.elements.get(o[2]);
-                        if(o[1]=="null"){
-                            if(e1.value()==""||e1.value()==null){
-                                if(o[3]=="required"){
-                                    if(e2.value()==""||e2.value()==null){
-                                        if(msg==""){
-                                            msg += z;
-                                        }else{
-                                            msg += "," + z;
-                                        }
-                                    }
+                    }
+                }else{
+                    //{name1 not null name2 contain 1,2}
+                    //第二个关键字 not is contain exclude
+                    var o = order.split(" ");
+                    if(o.length==3){
+                        if(!this.apply_order(o)){
+                            if(msg==""){
+                                msg += z;
+                            }else{
+                                msg += "," + z;
+                            }
+                        }
+                    }else if(o.length==6){
+                        var o1 = new Array();
+                        o1.push(o[0]);
+                        o1.push(o[1]);
+                        o1.push(o[2]);
+                        if(this.apply_order(o1)){
+                            var o2 = new Array();
+                            o2.push(o[3]);
+                            o2.push(o[4]);
+                            o2.push(o[5]);
+                            if(!this.apply_order(o2)){
+                                if(msg==""){
+                                    msg += z;
                                 }else{
-
+                                    msg += "," + z;
                                 }
                             }
-                        }else if(o[1]=="!null"){
-                            if(e1.value()!=""||e1.value()!=null){
-                                if(o[3]=="required"){
-                                    if(e2.value()==""||e2.value()==null){
-                                        if(msg==""){
-                                            msg += z;
-                                        }else{
-                                            msg += "," + z;
-                                        }
-                                    }
-                                }else{
-
-                                }
-                            }
-                        }else{
-
                         }
                     }
                 }
